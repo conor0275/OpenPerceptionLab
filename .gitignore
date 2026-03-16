@@ -1,5 +1,11 @@
 __pycache__/
 *.pyc
-.env
+*.pth
 *.pt
+*.onnx
+
 datasets/
+outputs/
+
+.env
+.ipynb_checkpoints
