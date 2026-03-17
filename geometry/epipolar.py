@@ -31,7 +31,6 @@ class EpipolarGeometry:
 
         return F, pts1, pts2, mask
 
-
 def draw_epilines(img1, img2, lines, pts1, pts2):
     """
     Draw epipolar lines on img1 and corresponding points on both images.
@@ -50,7 +49,7 @@ def draw_epilines(img1, img2, lines, pts1, pts2):
         color = tuple(np.random.randint(0, 255, 3).tolist())
 
         # line: ax + by + c = 0
-        if r_line[1] == 0:
+        if abs(float(r_line[1])) < 1e-12:
             continue
 
         x0, y0 = map(int, [0, -r_line[2] / r_line[1]])

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # OpenPerceptionLab
 
 A multi-stage perception and SLAM learning project.
@@ -23,3 +24,6 @@ Level5: LiDAR SLAM
 Level6: Sensor Fusion  
 Level7: 3D Reconstruction  
 Level8: Deployment
+=======
+# OpenPerceptionLab
+>>>>>>> origin/main
