@@ -6,6 +6,7 @@ from frontend.feature import FeatureExtractor
 from frontend.tracking import Tracker
 from visualization.viewer import TrajectoryViewer
 from backend.map import Map
+from visualization.viewer import PointCloudViewer
 
 # 相机内参
 K = np.array([
@@ -25,6 +26,8 @@ viewer = TrajectoryViewer()
 
 map = Map()
 tracker = Tracker(K, map)
+
+pc_viewer = PointCloudViewer()
 
 while True:
 
@@ -46,6 +49,8 @@ while True:
     trajectory.append(frame.pose_t.copy())
     viewer.update(frame.pose_t)
 
+    pc_viewer.update(map.points)
+    
     # 可视化
     cv2.imshow("frame", img)
 
