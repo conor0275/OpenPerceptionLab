@@ -8,6 +8,7 @@ demos/detect_demo.py
 demos/epipolar_demo.py
 demos/feature_match_demo.py
 demos/perception_demo.py
+demos/pose_demo.py
 demos/segmentation_demo.py
 demos/tempCodeRunnerFile.py
 demos/triangulation_demo.py
@@ -17,10 +18,14 @@ geometry/camera_model.py
 geometry/epipolar.py
 geometry/feature_matching.py
 geometry/pnp.py
+geometry/pose_estimation.py
 geometry/triangulation.py
+openperceptionlab/__init__.py
+openperceptionlab/__main__.py
 openperceptionlab.egg-info/PKG-INFO
 openperceptionlab.egg-info/SOURCES.txt
 openperceptionlab.egg-info/dependency_links.txt
+openperceptionlab.egg-info/entry_points.txt
 openperceptionlab.egg-info/top_level.txt
 perception/__init__.py
 perception/perception_system.py
@@ -28,3 +33,10 @@ perception/depth/__init__.py
 perception/depth/midas_depth.py
 perception/segmentation/__init__.py
 perception/segmentation/deeplab_segment.py
+slam/run_slam.py
+slam/backend/map.py
+slam/backend/optimizer.py
+slam/core/frame.py
+slam/frontend/feature.py
+slam/frontend/tracking.py
+slam/visualization/viewer.py
