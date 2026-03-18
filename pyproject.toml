@@ -9,6 +9,9 @@ description = "OpenPerceptionLab"
 readme = "README.md"
 requires-python = ">=3.10"
 
+[project.scripts]
+opl = "openperceptionlab.__main__:main"
+
 [tool.setuptools]
 include-package-data = true
 

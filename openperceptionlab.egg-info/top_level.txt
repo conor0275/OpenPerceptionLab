@@ -1,5 +1,7 @@
 datasets
 demos
 geometry
+openperceptionlab
 perception
+slam
 tools

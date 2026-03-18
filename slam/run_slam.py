@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import os
 
 from core.frame import Frame
 from frontend.feature import FeatureExtractor
@@ -15,7 +16,8 @@ K = np.array([
     [0, 0, 1]
 ])
 
-cap = cv2.VideoCapture(0)
+camera_index = int(os.environ.get("OPL_CAMERA_INDEX", "0"))
+cap = cv2.VideoCapture(camera_index)
 
 extractor = FeatureExtractor()
 
