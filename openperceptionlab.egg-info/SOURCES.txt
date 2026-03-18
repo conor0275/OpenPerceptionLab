@@ -22,6 +22,8 @@ geometry/pose_estimation.py
 geometry/triangulation.py
 openperceptionlab/__init__.py
 openperceptionlab/__main__.py
+openperceptionlab/config.py
+openperceptionlab/logging_utils.py
 openperceptionlab.egg-info/PKG-INFO
 openperceptionlab.egg-info/SOURCES.txt
 openperceptionlab.egg-info/dependency_links.txt
@@ -33,10 +35,15 @@ perception/depth/__init__.py
 perception/depth/midas_depth.py
 perception/segmentation/__init__.py
 perception/segmentation/deeplab_segment.py
+slam/__init__.py
 slam/run_slam.py
+slam/backend/__init__.py
 slam/backend/map.py
 slam/backend/optimizer.py
+slam/core/__init__.py
 slam/core/frame.py
+slam/frontend/__init__.py
 slam/frontend/feature.py
 slam/frontend/tracking.py
+slam/visualization/__init__.py
 slam/visualization/viewer.py

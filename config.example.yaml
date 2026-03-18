@@ -1,0 +1,23 @@
+camera:
+  index: 0
+  # width: 1280
+  # height: 720
+  # fps: 30
+
+intrinsics:
+  fx: 800
+  fy: 800
+  cx: 320
+  cy: 240
+
+viewer:
+  show_frame: true
+  show_trajectory: true
+  show_pointcloud: true
+  max_points: 200000
+  point_size: 2.0
+
+slam:
+  keyframe_interval: 10
+  log_every_n_frames: 30
+

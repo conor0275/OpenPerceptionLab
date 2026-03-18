@@ -5,21 +5,7 @@ import runpy
 import sys
 from pathlib import Path
 
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
-
-
-def _run_script(rel_path: str, argv: list[str]) -> int:
-    """
-    Run a repo script (e.g. slam/run_slam.py) as if executed directly.
-    """
-    script_path = (REPO_ROOT / rel_path).resolve()
-    if not script_path.exists():
-        raise SystemExit(f"Script not found: {script_path}")
-
-    sys.argv = [str(script_path), *argv]
-    runpy.run_path(str(script_path), run_name="__main__")
-    return 0
+from openperceptionlab.logging_utils import setup_logging
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -27,10 +13,21 @@ def build_parser() -> argparse.ArgumentParser:
         prog="openperceptionlab",
         description="OpenPerceptionLab unified entrypoint (camera-first).",
     )
+    p.add_argument(
+        "--log-level",
+        default="INFO",
+        help="Logging level (DEBUG/INFO/WARNING/ERROR). Default: INFO",
+    )
     sub = p.add_subparsers(dest="cmd", required=True)
 
     slam = sub.add_parser("slam", help="Run real-time monocular SLAM (camera).")
     slam.add_argument("--camera", type=int, default=0, help="Camera index (default: 0).")
+    slam.add_argument(
+        "--config",
+        type=str,
+        default=None,
+        help="Path to config YAML/JSON (optional).",
+    )
 
     demos = sub.add_parser("demo", help="Run demos (vision/geometry).")
     demos_sub = demos.add_subparsers(dest="demo", required=True)
@@ -65,16 +62,19 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    setup_logging(args.log_level)
 
     if args.cmd == "slam":
-        # Pass camera index through env var for now (minimal change to existing script)
-        import os
+        from slam.run_slam import main as slam_main
 
-        os.environ["OPL_CAMERA_INDEX"] = str(args.camera)
-        return _run_script("slam/run_slam.py", [])
+        return int(slam_main(camera_index=args.camera, config_path=args.config))
 
     if args.cmd == "demo":
-        return _run_script(args._script, [])
+        # Demos are still script-like for now; keep the behavior stable.
+        script_path = (Path(__file__).resolve().parents[1] / args._script).resolve()
+        sys.argv = [str(script_path)]
+        runpy.run_path(str(script_path), run_name="__main__")
+        return 0
 
     raise SystemExit("Unknown command")
 

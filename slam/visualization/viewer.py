@@ -23,7 +23,7 @@ class TrajectoryViewer:
 
 class PointCloudViewer:
 
-    def __init__(self):
+    def __init__(self, max_points: int = 200_000, point_size: float = 2.0):
 
         self.vis = o3d.visualization.Visualizer()
         self.vis.create_window("Point Cloud")
@@ -31,9 +31,10 @@ class PointCloudViewer:
         self.pcd = o3d.geometry.PointCloud()
         self._geometry_added = False
         self._initialized_view = False
+        self.max_points = int(max_points)
         opt = self.vis.get_render_option()
         if opt is not None:
-            opt.point_size = 2.0
+            opt.point_size = float(point_size)
             opt.background_color = np.asarray([0.0, 0.0, 0.0])
 
         self._axes_added = False
@@ -53,8 +54,8 @@ class PointCloudViewer:
             return
 
         # Keep visualization responsive
-        if pts.shape[0] > 200000:
-            pts = pts[-200000:]
+        if self.max_points > 0 and pts.shape[0] > self.max_points:
+            pts = pts[-self.max_points :]
 
         self.pcd.points = o3d.utility.Vector3dVector(pts)
         self.pcd.paint_uniform_color([0.2, 0.9, 0.2])

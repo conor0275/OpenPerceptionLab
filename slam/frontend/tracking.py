@@ -1,15 +1,20 @@
 import cv2
 import numpy as np
 
-from backend.optimizer import BundleAdjuster
+from slam.backend.optimizer import BundleAdjuster
+
+import logging
+
+logger = logging.getLogger("opl.slam.tracker")
 
 class Tracker:
 
-    def __init__(self, K, map_obj=None):
+    def __init__(self, K, map_obj=None, *, keyframe_interval: int = 10):
         self.K = np.asarray(K, dtype=np.float64)
         self.prev_frame = None
         self.map = map_obj
         self.bundle_adjuster = BundleAdjuster(self.K)
+        self.keyframe_interval = int(keyframe_interval)
 
     def process(self, frame):
 
@@ -140,7 +145,7 @@ class Tracker:
         self.prev_frame = frame
 
         # 判断是否关键帧（简单策略）
-        if frame.id % 10 == 0:
+        if self.keyframe_interval > 0 and frame.id % self.keyframe_interval == 0:
             frame.is_keyframe = True
             if self.map is not None:
                 self.map.add_keyframe(frame)
