@@ -58,6 +58,14 @@ def build_parser() -> argparse.ArgumentParser:
     sfm_cmd.add_argument("--min-matches", type=int, default=50, help="Min matches for two-view init.")
     sfm_cmd.add_argument("--pattern", type=str, default="*", help="Image glob pattern.")
 
+    export_cmd = sub.add_parser("export", help="Export model to ONNX (Stage 6).")
+    export_cmd.add_argument("--output", "-o", type=str, default="model_tiny.onnx", help="Output ONNX path.")
+    export_cmd.add_argument("--model", type=str, default="tiny", choices=["tiny", "depth"], help="Model: tiny (no torch) or depth (MiDaS, needs torch).")
+
+    infer_cmd = sub.add_parser("infer", help="Run ONNX inference (Stage 6).")
+    infer_cmd.add_argument("model_path", type=str, help="Path to ONNX model.")
+    infer_cmd.add_argument("--image", type=str, default=None, help="Optional image path for demo.")
+
     demos = sub.add_parser("demo", help="Run demos (vision/geometry).")
     demos.add_argument("--image", type=str, default=None, help="Input image path (single-image demos).")
     demos.add_argument("--camera", type=int, default=None, help="Camera device index (demos that support live input).")
@@ -176,6 +184,20 @@ def main(argv: list[str] | None = None) -> int:
                 image_pattern=getattr(args, "pattern", "*"),
             )
         )
+
+    if args.cmd == "export":
+        from deployment.run_export import main_export
+        return int(main_export(
+            output=getattr(args, "output", "model_tiny.onnx"),
+            model_type=getattr(args, "model", "tiny"),
+        ))
+
+    if args.cmd == "infer":
+        from deployment.run_export import main_infer
+        return int(main_infer(
+            getattr(args, "model_path"),
+            getattr(args, "image", None),
+        ))
 
     if args.cmd == "demo":
         import os

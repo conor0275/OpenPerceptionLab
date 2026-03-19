@@ -8,6 +8,7 @@ import numpy as np
 
 # 存储点云 + 关键帧
 from slam.backend.map import Map
+from slam.backend.loop_closure import LoopClosureDetector
 # 图像+特征+位姿
 from slam.core.frame import Frame
 # 提取 ORB 特征
@@ -53,6 +54,7 @@ def main(
     else:
         map_ = Map()
     tracker = Tracker(K, map_, keyframe_interval=config.slam.keyframe_interval)
+    loop_detector = LoopClosureDetector(match_threshold=25, min_frame_gap=15)
 
     frame_id = 0
     traj_viewer = TrajectoryViewer() if config.viewer.show_trajectory else None
@@ -75,6 +77,12 @@ def main(
         frame.descriptors = des
 
         frame = tracker.process(frame)
+
+        if frame.is_keyframe and frame.descriptors is not None:
+            is_loop, loop_id = loop_detector.detect(frame.id, frame.descriptors)
+            if is_loop:
+                logger.info("Loop closure: frame %d -> keyframe %d", frame.id, loop_id)
+            loop_detector.add_keyframe(frame.id, frame.descriptors)
 
         if traj_viewer is not None:
             traj_viewer.update(frame.pose_t)
