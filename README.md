@@ -26,19 +26,25 @@ python -m openperceptionlab --help
 
 ```bash
 python -m openperceptionlab slam --camera 0
+# 退出时保存地图、下次加载继续
+python -m openperceptionlab slam --camera 0 --save-map map.npz
+python -m openperceptionlab slam --camera 0 --load-map map.npz --save-map map2.npz
 ```
 
 ### 跑 Demo
 
+单图 demo 可用 `--image` 指定输入，双图 demo 用 `--image1` / `--image2`（不指定则用默认文件名如 test.jpg、image1.jpg）：
+
 ```bash
 python -m openperceptionlab demo detect
+python -m openperceptionlab demo depth --image path/to/photo.jpg
+python -m openperceptionlab demo triangulation --image1 left.jpg --image2 right.jpg
 python -m openperceptionlab demo segment
-python -m openperceptionlab demo depth
 python -m openperceptionlab demo perception
 python -m openperceptionlab demo camera
 python -m openperceptionlab demo epipolar
-python -m openperceptionlab demo triangulation
 python -m openperceptionlab demo pose
+python -m openperceptionlab demo feature_match
 ```
 
 也可以用更短的命令（安装后自动提供）：
@@ -53,6 +59,8 @@ opl slam --camera 0
 - **Stage 0（已开始）**：视觉感知任务（检测 / 分割 / 深度）
 - **Stage 1（进行中）**：多视图几何（相机模型 / 三角化 / BA）
 - **Stage 2（进行中）**：视觉 SLAM（特征、位姿、稀疏地图、优化）
+  - **当前能力**：实时 VO + 局部 BA + 轨迹/点云可视化 + 地图保存与加载（`--save-map` / `--load-map`）。
+  - **限制**：单目无绝对尺度、无回环、长时间会漂移。
 - **Stage 3**：LiDAR SLAM 与点云建图
 - **Stage 4**：多传感器融合（VIO、LiDAR-Vision，GTSAM/Ceres）
 - **Stage 5**：3D 重建（SFM、NeRF、3D Gaussian Splatting）

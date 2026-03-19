@@ -1,3 +1,4 @@
+import os
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,9 +7,13 @@ from geometry.feature_matching import FeatureMatcher
 from geometry.epipolar import EpipolarGeometry
 from geometry.triangulation import Triangulator
 
-# 读取图像
-img1 = cv2.imread("image1.jpg", 0)
-img2 = cv2.imread("image2.jpg", 0)
+# 读取图像（可通过 opl demo triangulation --image1 a.jpg --image2 b.jpg 指定）
+path1 = os.environ.get("OPL_DEMO_IMAGE1") or "image1.jpg"
+path2 = os.environ.get("OPL_DEMO_IMAGE2") or "image2.jpg"
+img1 = cv2.imread(path1, 0)
+img2 = cv2.imread(path2, 0)
+if img1 is None or img2 is None:
+    raise FileNotFoundError(f"Images not found: {path1!r}, {path2!r}")
 
 # 特征匹配
 matcher = FeatureMatcher()

@@ -26,6 +26,8 @@ def main(
     camera_index: int | None = None,
     config: AppConfig | None = None,
     config_path: str | None = None,
+    load_map_path: str | None = None,
+    save_map_path: str | None = None,
 ) -> int:
     if config is None:
         config = load_config(config_path)
@@ -45,7 +47,11 @@ def main(
         cap.set(cv2.CAP_PROP_FPS, int(config.camera.fps))
 
     extractor = FeatureExtractor()
-    map_ = Map()
+    if load_map_path:
+        map_ = Map.load(load_map_path)
+        logger.info("Loaded map from %s: %d points, %d keyframes", load_map_path, len(map_.points), len(map_.keyframes))
+    else:
+        map_ = Map()
     tracker = Tracker(K, map_, keyframe_interval=config.slam.keyframe_interval)
 
     frame_id = 0
@@ -90,6 +96,9 @@ def main(
 
     cap.release()
     cv2.destroyAllWindows()
+    if save_map_path:
+        map_.save(save_map_path)
+        logger.info("Saved map to %s: %d points, %d keyframes", save_map_path, len(map_.points), len(map_.keyframes))
     return 0
 
 
