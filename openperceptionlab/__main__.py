@@ -39,6 +39,16 @@ def build_parser() -> argparse.ArgumentParser:
     lidar_slam.add_argument("--show", action="store_true", help="Show live map window.")
     lidar_slam.add_argument("--sample", action="store_true", help="Generate sample PCDs in ./sample_pcds and run on them.")
     lidar_slam.add_argument("--pattern", type=str, default="*.pcd", help="Glob pattern for PCD files.")
+    lidar_slam.add_argument("--save-trajectory", type=str, default=None, help="Save LiDAR trajectory to .npz for fusion (Stage 4).")
+
+    fusion_cmd = sub.add_parser("fusion", help="LiDAR-Vision pose graph fusion (Stage 4).")
+    fusion_cmd.add_argument("--vo-map", type=str, default=None, help="Visual SLAM map .npz (keyframe poses).")
+    fusion_cmd.add_argument("--lidar-trajectory", type=str, default=None, help="LiDAR trajectory .npz from lidar-slam --save-trajectory.")
+    fusion_cmd.add_argument("--output", "-o", type=str, default=None, help="Output fused 2D trajectory .npz.")
+    fusion_cmd.add_argument("--demo", action="store_true", help="Run on synthetic trajectories (no data files).")
+    fusion_cmd.add_argument("--demo-frames", type=int, default=15, help="Number of frames for --demo.")
+    fusion_cmd.add_argument("--prior", type=str, default="vo", choices=["vo", "lidar"], help="Which trajectory to fix as prior.")
+    fusion_cmd.add_argument("--max-iter", type=int, default=20, help="Pose graph max iterations.")
 
     demos = sub.add_parser("demo", help="Run demos (vision/geometry).")
     demos.add_argument("--image", type=str, default=None, help="Input image path (single-image demos).")
@@ -116,6 +126,22 @@ def main(argv: list[str] | None = None) -> int:
                 max_correspondence_distance=args.max_correspondence_distance,
                 show_live=args.show,
                 pattern=args.pattern,
+                save_trajectory_path=getattr(args, "save_trajectory", None),
+            )
+        )
+
+    if args.cmd == "fusion":
+        from fusion.run_fusion import main as fusion_main
+
+        return int(
+            fusion_main(
+                vo_map_path=getattr(args, "vo_map", None),
+                lidar_trajectory_path=getattr(args, "lidar_trajectory", None),
+                output_path=getattr(args, "output", None),
+                demo=getattr(args, "demo", False),
+                demo_frames=getattr(args, "demo_frames", 15),
+                prior_use=getattr(args, "prior", "vo"),
+                max_iter=getattr(args, "max_iter", 20),
             )
         )
 

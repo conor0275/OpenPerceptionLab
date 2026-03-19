@@ -21,9 +21,11 @@ def main(
     max_correspondence_distance: float = 0.5,
     show_live: bool = False,
     pattern: str = "*.pcd",
+    save_trajectory_path: str | Path | None = None,
 ) -> int:
     """
     Run LiDAR SLAM on a directory of PCD files. Saves global map to output_map.
+    If save_trajectory_path is set, saves trajectory as .npz (poses Nx4x4) for fusion.
     """
     sequence_dir = Path(sequence_dir)
     output_map = Path(output_map)
@@ -61,6 +63,12 @@ def main(
     final_pcd = map_.get_global_pcd(downsample=True)
     save_pcd(final_pcd, output_map)
     logger.info("Saved map to %s (%d points)", output_map, len(final_pcd.points))
+    if save_trajectory_path is not None:
+        traj = map_.trajectory
+        if len(traj) > 0:
+            poses_arr = np.array(traj, dtype=np.float64)
+            np.savez_compressed(save_trajectory_path, poses=poses_arr)
+            logger.info("Saved trajectory to %s (%d poses)", save_trajectory_path, len(traj))
     if vis is not None:
         vis.destroy_window()
     return 0

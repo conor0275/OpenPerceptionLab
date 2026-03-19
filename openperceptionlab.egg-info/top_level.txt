@@ -1,8 +1,10 @@
 datasets
 demos
 geometry
+lidar
 openperceptionlab
 perception
+sample_pcds
 slam
 tests
 tools

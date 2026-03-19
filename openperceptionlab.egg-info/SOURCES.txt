@@ -20,6 +20,13 @@ geometry/feature_matching.py
 geometry/pnp.py
 geometry/pose_estimation.py
 geometry/triangulation.py
+lidar/__init__.py
+lidar/io.py
+lidar/map.py
+lidar/odometry.py
+lidar/registration.py
+lidar/run_lidar_slam.py
+lidar/sample_data.py
 openperceptionlab/__init__.py
 openperceptionlab/__main__.py
 openperceptionlab/config.py
@@ -50,4 +57,6 @@ slam/visualization/__init__.py
 slam/visualization/viewer.py
 tests/__init__.py
 tests/test_config.py
+tests/test_lidar_import.py
+tests/test_map_save_load.py
 tests/test_slam_import.py

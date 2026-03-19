@@ -8,6 +8,7 @@
 - **多视图几何（Demo）**：相机模型、极几何、位姿估计、三角化
 - **视觉 SLAM（实时摄像头）**：轨迹可视化 + 稀疏点云（Open3D）
 - **LiDAR SLAM（点云序列）**：PCD 序列 → ICP 里程计 → 全局点云地图（Stage 3）
+- **多传感器融合（Stage 4）**：视觉 + LiDAR 位姿的 2D pose graph 融合，可选 VIO 接口占位
 
 ## 🚀 统一入口（推荐）
 
@@ -73,6 +74,19 @@ opl lidar-slam /path/to/pcd_dir --output-map my_map.pcd --voxel-size 0.05 --show
 python -m lidar.sample_data sample_pcds -n 5
 ```
 
+### 多传感器融合（Stage 4）
+
+用 2D 位姿图融合视觉与 LiDAR 轨迹（需先有视觉地图与 LiDAR 轨迹）：
+
+```bash
+# 合成数据演示（无需真实数据）
+opl fusion --demo -o fused_trajectory.npz
+
+# 使用真实数据：视觉地图（slam --save-map）+ LiDAR 轨迹（lidar-slam --save-trajectory）
+opl lidar-slam --sample -o lidar_map.pcd --save-trajectory lidar_traj.npz
+opl fusion --vo-map map.npz --lidar-trajectory lidar_traj.npz -o fused_trajectory.npz
+```
+
 ## 🧭 路线图（升级打怪）
 
 - **Stage 0（已开始）**：视觉感知任务（检测 / 分割 / 深度）
@@ -83,7 +97,9 @@ python -m lidar.sample_data sample_pcds -n 5
 - **Stage 3（已开始）**：LiDAR SLAM 与点云建图
   - **当前能力**：PCD 序列输入、ICP 帧间配准、全局点云地图保存（`.pcd`）。
   - **限制**：暂无回环、未用 IMU；适合离线/录制的点云序列。
-- **Stage 4**：多传感器融合（VIO、LiDAR-Vision，GTSAM/Ceres）
+- **Stage 4（已开始）**：多传感器融合（LiDAR-Vision pose graph、VIO 占位）
+  - **当前能力**：2D pose graph 融合视觉与 LiDAR 轨迹；LiDAR 支持 `--save-trajectory`；VIO 接口占位。
+  - **限制**：2D 平面、无 IMU 融合、未接入 GTSAM/Ceres。
 - **Stage 5**：3D 重建（SFM、NeRF、3D Gaussian Splatting）
 - **Stage 6**：模型压缩与端侧部署（ONNX / TensorRT）
 
@@ -95,6 +111,7 @@ geometry/             # 多视图几何模块
 perception/           # 感知模块（检测/分割/深度）
 slam/                 # 视觉 SLAM（frontend/backend/core/visualization）
 lidar/                # LiDAR SLAM（io/registration/map/odometry）
+fusion/               # 多传感器融合（pose graph、LiDAR-Vision、VIO 占位）
 openperceptionlab/    # 统一入口（python -m openperceptionlab / opl）
 ```
 
