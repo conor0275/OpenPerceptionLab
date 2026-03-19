@@ -31,6 +31,15 @@ def build_parser() -> argparse.ArgumentParser:
     slam.add_argument("--load-map", type=str, default=None, help="Load map from .npz file before running.")
     slam.add_argument("--save-map", type=str, default=None, help="Save map to .npz file on exit.")
 
+    lidar_slam = sub.add_parser("lidar-slam", help="LiDAR SLAM from PCD sequence (Stage 3).")
+    lidar_slam.add_argument("sequence_dir", type=str, nargs="?", default=None, help="Directory of PCD files (or use --sample).")
+    lidar_slam.add_argument("--output-map", "-o", type=str, default="lidar_map.pcd", help="Output map path.")
+    lidar_slam.add_argument("--voxel-size", type=float, default=0.05, help="Voxel size for map.")
+    lidar_slam.add_argument("--max-correspondence-distance", type=float, default=0.5, help="ICP max correspondence distance.")
+    lidar_slam.add_argument("--show", action="store_true", help="Show live map window.")
+    lidar_slam.add_argument("--sample", action="store_true", help="Generate sample PCDs in ./sample_pcds and run on them.")
+    lidar_slam.add_argument("--pattern", type=str, default="*.pcd", help="Glob pattern for PCD files.")
+
     demos = sub.add_parser("demo", help="Run demos (vision/geometry).")
     demos.add_argument("--image", type=str, default=None, help="Input image path (single-image demos).")
     demos.add_argument("--camera", type=int, default=None, help="Camera device index (demos that support live input).")
@@ -82,6 +91,31 @@ def main(argv: list[str] | None = None) -> int:
                 config_path=args.config,
                 load_map_path=args.load_map,
                 save_map_path=args.save_map,
+            )
+        )
+
+    if args.cmd == "lidar-slam":
+        from lidar.run_lidar_slam import main as lidar_main
+
+        if getattr(args, "sample", False):
+            from pathlib import Path
+            from lidar.sample_data import generate_sample_sequence
+            sample_dir = Path("sample_pcds")
+            generate_sample_sequence(sample_dir)
+            seq_dir = sample_dir
+        else:
+            seq_dir = getattr(args, "sequence_dir", None)
+            if not seq_dir:
+                print("Provide sequence_dir or use --sample to generate sample PCDs.", file=sys.stderr)
+                return 1
+        return int(
+            lidar_main(
+                sequence_dir=seq_dir,
+                output_map=args.output_map,
+                voxel_size=args.voxel_size,
+                max_correspondence_distance=args.max_correspondence_distance,
+                show_live=args.show,
+                pattern=args.pattern,
             )
         )
 

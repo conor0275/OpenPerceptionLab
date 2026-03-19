@@ -7,6 +7,8 @@ __pycache__/
 
 datasets/
 outputs/
+sample_pcds/
+lidar_map.pcd
 
 .env
 .ipynb_checkpoints

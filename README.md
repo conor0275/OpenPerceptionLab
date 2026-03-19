@@ -7,6 +7,7 @@
 - **视觉感知（Demo）**：目标检测 / 语义分割 / 单目深度估计
 - **多视图几何（Demo）**：相机模型、极几何、位姿估计、三角化
 - **视觉 SLAM（实时摄像头）**：轨迹可视化 + 稀疏点云（Open3D）
+- **LiDAR SLAM（点云序列）**：PCD 序列 → ICP 里程计 → 全局点云地图（Stage 3）
 
 ## 🚀 统一入口（推荐）
 
@@ -54,6 +55,24 @@ opl --help
 opl slam --camera 0
 ```
 
+### LiDAR SLAM（点云建图，Stage 3）
+
+对目录下的一串 PCD 做 ICP 建图并保存全局点云：
+
+```bash
+# 用自带的合成数据试跑（生成 sample_pcds/ 并建图）
+opl lidar-slam --sample -o lidar_map.pcd
+
+# 用自己的 PCD 序列（目录内按文件名排序的 *.pcd）
+opl lidar-slam /path/to/pcd_dir --output-map my_map.pcd --voxel-size 0.05 --show
+```
+
+生成测试用 PCD 序列（不跑 SLAM）：
+
+```bash
+python -m lidar.sample_data sample_pcds -n 5
+```
+
 ## 🧭 路线图（升级打怪）
 
 - **Stage 0（已开始）**：视觉感知任务（检测 / 分割 / 深度）
@@ -61,7 +80,9 @@ opl slam --camera 0
 - **Stage 2（进行中）**：视觉 SLAM（特征、位姿、稀疏地图、优化）
   - **当前能力**：实时 VO + 局部 BA + 轨迹/点云可视化 + 地图保存与加载（`--save-map` / `--load-map`）。
   - **限制**：单目无绝对尺度、无回环、长时间会漂移。
-- **Stage 3**：LiDAR SLAM 与点云建图
+- **Stage 3（已开始）**：LiDAR SLAM 与点云建图
+  - **当前能力**：PCD 序列输入、ICP 帧间配准、全局点云地图保存（`.pcd`）。
+  - **限制**：暂无回环、未用 IMU；适合离线/录制的点云序列。
 - **Stage 4**：多传感器融合（VIO、LiDAR-Vision，GTSAM/Ceres）
 - **Stage 5**：3D 重建（SFM、NeRF、3D Gaussian Splatting）
 - **Stage 6**：模型压缩与端侧部署（ONNX / TensorRT）
@@ -72,7 +93,8 @@ opl slam --camera 0
 demos/                # 小实验 & 练手 demo
 geometry/             # 多视图几何模块
 perception/           # 感知模块（检测/分割/深度）
-slam/                 # SLAM 系统（frontend/backend/core/visualization）
+slam/                 # 视觉 SLAM（frontend/backend/core/visualization）
+lidar/                # LiDAR SLAM（io/registration/map/odometry）
 openperceptionlab/    # 统一入口（python -m openperceptionlab / opl）
 ```
 
