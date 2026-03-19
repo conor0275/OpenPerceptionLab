@@ -12,6 +12,13 @@ demos/pose_demo.py
 demos/segmentation_demo.py
 demos/tempCodeRunnerFile.py
 demos/triangulation_demo.py
+fusion/__init__.py
+fusion/io.py
+fusion/lidar_vision_fusion.py
+fusion/pose_graph_2d.py
+fusion/poses.py
+fusion/run_fusion.py
+fusion/vio.py
 geometry/__init__.py
 geometry/bundle_adjustment.py
 geometry/camera_model.py
@@ -57,6 +64,7 @@ slam/visualization/__init__.py
 slam/visualization/viewer.py
 tests/__init__.py
 tests/test_config.py
+tests/test_fusion_import.py
 tests/test_lidar_import.py
 tests/test_map_save_load.py
 tests/test_slam_import.py

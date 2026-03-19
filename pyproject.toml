@@ -20,6 +20,7 @@ include-package-data = true
 
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["openperceptionlab*", "slam*", "lidar*", "fusion*", "geometry*", "perception*", "demos*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

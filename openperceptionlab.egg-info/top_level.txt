@@ -1,10 +1,7 @@
-datasets
 demos
+fusion
 geometry
 lidar
 openperceptionlab
 perception
-sample_pcds
 slam
-tests
-tools
