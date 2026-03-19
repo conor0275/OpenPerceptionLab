@@ -4,4 +4,5 @@ geometry
 openperceptionlab
 perception
 slam
+tests
 tools

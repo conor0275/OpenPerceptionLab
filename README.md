@@ -2,7 +2,7 @@
 
 一个长期演进的 **多传感器感知与 SLAM 平台**（camera-first），按“升级打怪”路线逐阶段实现：感知 → 多视图几何 → 视觉 SLAM → LiDAR SLAM → 多传感器融合 → 3D 重建 → 端侧部署。
 
-## ✨ 你现在能做什么
+## ✨ 现在能做什么
 
 - **视觉感知（Demo）**：目标检测 / 语义分割 / 单目深度估计
 - **多视图几何（Demo）**：相机模型、极几何、位姿估计、三角化
@@ -68,7 +68,15 @@ slam/                 # SLAM 系统（frontend/backend/core/visualization）
 openperceptionlab/    # 统一入口（python -m openperceptionlab / opl）
 ```
 
+## 🧪 开发与测试
+
+- **安装开发依赖（含 pytest）**：`pip install -e ".[dev]"`
+- **运行测试**：在项目根目录执行 `pytest tests/ -v`
+- **配置文件**：复制 `config.example.yaml` 为 `config.yaml` 后按需修改，SLAM 可通过 `opl slam --config config.yaml` 加载。
+
+推送/PR 到 `main` 或 `master` 时会自动跑 CI（pytest，Python 3.10/3.11）。
+
 ## 📌 说明
 
-- 本项目优先保证 **实时摄像头可跑通**，然后逐步补齐工程化（配置、日志、测试、数据集支持）。
+- 本项目优先保证 **实时摄像头可跑通**，然后逐步补齐工程化（配置、日志、测试、CI、数据集支持）。
 - 后续允许引入 **C++**（性能关键模块 / 优化器 / 部署），但会保持 Python 入口与工程体验一致。

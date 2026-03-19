@@ -28,6 +28,7 @@ openperceptionlab.egg-info/PKG-INFO
 openperceptionlab.egg-info/SOURCES.txt
 openperceptionlab.egg-info/dependency_links.txt
 openperceptionlab.egg-info/entry_points.txt
+openperceptionlab.egg-info/requires.txt
 openperceptionlab.egg-info/top_level.txt
 perception/__init__.py
 perception/perception_system.py
@@ -47,3 +48,6 @@ slam/frontend/feature.py
 slam/frontend/tracking.py
 slam/visualization/__init__.py
 slam/visualization/viewer.py
+tests/__init__.py
+tests/test_config.py
+tests/test_slam_import.py

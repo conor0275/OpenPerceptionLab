@@ -6,10 +6,15 @@ import logging
 import cv2
 import numpy as np
 
+# 存储点云 + 关键帧
 from slam.backend.map import Map
+# 图像+特征+位姿
 from slam.core.frame import Frame
+# 提取 ORB 特征
 from slam.frontend.feature import FeatureExtractor
+# 估计相机运动
 from slam.frontend.tracking import Tracker
+# 可视化轨迹/点云
 from slam.visualization.viewer import PointCloudViewer, TrajectoryViewer
 from openperceptionlab.config import AppConfig, load_config
 
