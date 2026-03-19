@@ -1,18 +1,3 @@
-<<<<<<< HEAD
-__pycache__/
-*.pyc
-*.pth
-*.pt
-*.onnx
-
-datasets/
-outputs/
-sample_pcds/
-lidar_map.pcd
-
-.env
-.ipynb_checkpoints
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
@@ -220,4 +205,14 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
->>>>>>> origin/main
+
+# OpenPerceptionLab generated / local
+datasets/
+outputs/
+sample_pcds/
+lidar_map.pcd
+sample_sfm_images/
+sfm_pointcloud.ply
+sfm_poses.npz
+fused_trajectory.npz
+.env

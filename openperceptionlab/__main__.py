@@ -50,6 +50,14 @@ def build_parser() -> argparse.ArgumentParser:
     fusion_cmd.add_argument("--prior", type=str, default="vo", choices=["vo", "lidar"], help="Which trajectory to fix as prior.")
     fusion_cmd.add_argument("--max-iter", type=int, default=20, help="Pose graph max iterations.")
 
+    sfm_cmd = sub.add_parser("sfm", help="Structure from Motion: sparse 3D reconstruction (Stage 5).")
+    sfm_cmd.add_argument("images_dir", type=str, nargs="?", default=None, help="Directory of images (or use --sample).")
+    sfm_cmd.add_argument("--output", "-o", type=str, default="sfm_pointcloud.ply", help="Output PLY path.")
+    sfm_cmd.add_argument("--poses", type=str, default=None, help="Output camera poses .npz.")
+    sfm_cmd.add_argument("--sample", action="store_true", help="Generate sample images in ./sample_sfm_images and run SfM.")
+    sfm_cmd.add_argument("--min-matches", type=int, default=50, help="Min matches for two-view init.")
+    sfm_cmd.add_argument("--pattern", type=str, default="*", help="Image glob pattern.")
+
     demos = sub.add_parser("demo", help="Run demos (vision/geometry).")
     demos.add_argument("--image", type=str, default=None, help="Input image path (single-image demos).")
     demos.add_argument("--camera", type=int, default=None, help="Camera device index (demos that support live input).")
@@ -142,6 +150,30 @@ def main(argv: list[str] | None = None) -> int:
                 demo_frames=getattr(args, "demo_frames", 15),
                 prior_use=getattr(args, "prior", "vo"),
                 max_iter=getattr(args, "max_iter", 20),
+            )
+        )
+
+    if args.cmd == "sfm":
+        from reconstruction.run_sfm import main as sfm_main
+
+        if getattr(args, "sample", False):
+            from pathlib import Path
+            from reconstruction.sample_images import generate_sample_images
+            sample_dir = Path("sample_sfm_images")
+            generate_sample_images(sample_dir, n=5)
+            images_dir = sample_dir
+        else:
+            images_dir = getattr(args, "images_dir", None)
+            if not images_dir:
+                print("Provide images_dir or use --sample to generate sample images.", file=sys.stderr)
+                return 1
+        return int(
+            sfm_main(
+                images_dir=images_dir,
+                output_ply=getattr(args, "output", "sfm_pointcloud.ply"),
+                output_poses=getattr(args, "poses", None),
+                min_matches=getattr(args, "min_matches", 50),
+                image_pattern=getattr(args, "pattern", "*"),
             )
         )
 
