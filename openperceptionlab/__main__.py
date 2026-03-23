@@ -62,9 +62,27 @@ def build_parser() -> argparse.ArgumentParser:
     export_cmd.add_argument("--output", "-o", type=str, default="model_tiny.onnx", help="Output ONNX path.")
     export_cmd.add_argument("--model", type=str, default="tiny", choices=["tiny", "depth"], help="Model: tiny (no torch) or depth (MiDaS, needs torch).")
 
-    infer_cmd = sub.add_parser("infer", help="Run ONNX inference (Stage 6).")
+    infer_cmd = sub.add_parser("infer", help="Run ONNX inference (Stage 6). GPU/TensorRT: see docs/GPU_DEPLOY.md.")
     infer_cmd.add_argument("model_path", type=str, help="Path to ONNX model.")
     infer_cmd.add_argument("--image", type=str, default=None, help="Optional image path for demo.")
+    infer_cmd.add_argument(
+        "--gpu",
+        action="store_true",
+        help="Prefer CUDAExecutionProvider (needs onnxruntime-gpu + CUDA).",
+    )
+    infer_cmd.add_argument(
+        "--tensorrt",
+        action="store_true",
+        help="Prefer TensorrtExecutionProvider (ORT+TensorRT build + TRT libs).",
+    )
+    infer_cmd.add_argument("--device-id", type=int, default=0, help="GPU device id (default: 0).")
+    infer_cmd.add_argument("--warmup", type=int, default=3, help="Warmup runs before timing.")
+    infer_cmd.add_argument("--runs", type=int, default=1, help="Timed runs (mean latency logged if >1).")
+    infer_cmd.add_argument(
+        "--list-providers",
+        action="store_true",
+        help="Print onnxruntime.get_available_providers() and exit 0.",
+    )
 
     demos = sub.add_parser("demo", help="Run demos (vision/geometry).")
     demos.add_argument("--image", type=str, default=None, help="Input image path (single-image demos).")
@@ -194,10 +212,28 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.cmd == "infer":
         from deployment.run_export import main_infer
-        return int(main_infer(
-            getattr(args, "model_path"),
-            getattr(args, "image", None),
-        ))
+
+        if getattr(args, "list_providers", False):
+            try:
+                import onnxruntime as ort
+
+                print(ort.get_available_providers())
+                return 0
+            except ImportError:
+                print("onnxruntime not installed", file=sys.stderr)
+                return 1
+        return int(
+            main_infer(
+                getattr(args, "model_path"),
+                getattr(args, "image", None),
+                prefer_gpu=getattr(args, "gpu", False),
+                prefer_tensorrt=getattr(args, "tensorrt", False),
+                device_id=getattr(args, "device_id", 0),
+                warmup=getattr(args, "warmup", 3),
+                runs=getattr(args, "runs", 1),
+                list_providers=False,
+            )
+        )
 
     if args.cmd == "demo":
         import os

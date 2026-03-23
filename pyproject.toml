@@ -12,6 +12,13 @@ requires-python = ">=3.10"
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "numpy>=1.20"]
 deploy = ["onnx>=1.14", "onnxruntime>=1.15", "torch>=2.0", "torchvision>=0.15"]
+# GPU 机：不要与 onnxruntime 同时安装，请先 pip uninstall onnxruntime 再装 gpu 版
+deploy-gpu = [
+    "onnx>=1.14",
+    "onnxruntime-gpu>=1.15",
+    "torch>=2.0",
+    "torchvision>=0.15",
+]
 
 [project.scripts]
 opl = "openperceptionlab.__main__:main"

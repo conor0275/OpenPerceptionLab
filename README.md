@@ -12,6 +12,15 @@
 - **3D 重建（Stage 5）**：增量式 SfM（稀疏点云 + 相机位姿），NeRF/3DGS 占位
 - **端侧部署（Stage 6）**：ONNX 导出与推理、TensorRT 占位；前阶段缓解：尺度对齐、3D 位姿图、回环检测、IMU 传播
 
+### 分支：GPU / ONNX / TensorRT 高性能版
+
+使用分支 **`feature/gpu-onnx-trt`** 时，可获得：
+
+- ONNX Runtime **CUDA** / **TensorRT Execution Provider**（见 `deployment/ort_gpu.py`）
+- CLI：`opl infer model.onnx --gpu`、`--tensorrt`、`--runs` 测延迟
+- 可选：`pip install -e ".[deploy-gpu]"`（**勿与** `onnxruntime` CPU 包混装）
+- 完整说明：**[docs/GPU_DEPLOY.md](docs/GPU_DEPLOY.md)**
+
 ## 🚀 统一入口（推荐）
 
 先在项目根目录安装一次（可编辑安装，后续改代码无需反复安装）：

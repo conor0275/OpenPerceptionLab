@@ -1,1 +1,1 @@
-"""Model export and edge deployment: ONNX, TensorRT placeholder (Stage 6)."""
+"""Model export and edge deployment: ONNX, ORT (CPU/GPU/TensorRT EP), trtexec helper (Stage 6)."""
