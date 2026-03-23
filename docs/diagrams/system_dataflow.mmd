@@ -1,0 +1,91 @@
+%% OpenPerceptionLab 系统数据流总览（与 docs/DATAFLOW.md 第 1 节一致）
+%% 导出示例：见 DATAFLOW.md「第 4 节」
+flowchart TB
+    subgraph inputs["外部输入"]
+        CAM[摄像头视频流]
+        PCD[PCD 点云序列目录]
+        IMG[图像目录 / 单张图]
+        CFG[config.yaml / 默认内参 K]
+    end
+
+    subgraph entry["统一入口 python -m openperceptionlab"]
+        CLI[子命令路由]
+    end
+
+    subgraph slam_p["视觉 SLAM slam"]
+        FE[FeatureExtractor]
+        TR[Tracker + Map]
+        LC[LoopClosureDetector]
+        VIZ1[TrajectoryViewer / PointCloudViewer / OpenCV 窗口]
+    end
+
+    subgraph lidar_p["LiDAR SLAM lidar-slam"]
+        LOAD[load_pcd_sequence]
+        ODOM[LiDAROdometry ICP]
+        MAP[PointCloudMap]
+        O3D[Open3D 可视化可选]
+    end
+
+    subgraph fusion_p["融合 fusion"]
+        LVO[load_vo_trajectory_from_map]
+        LLD[load_lidar_trajectory]
+        PG[PoseGraph2D 优化]
+    end
+
+    subgraph sfm_p["重建 sfm"]
+        LI[load_images_from_dir]
+        SF[IncrementalSfM]
+    end
+
+    subgraph perc_p["感知 demo perception / detect / depth / segment"]
+        PS[PerceptionSystem]
+    end
+
+    subgraph deploy_p["部署 export / infer"]
+        ONNX[ONNX 文件]
+        ORT[ONNX Runtime]
+    end
+
+    CAM --> CLI
+    PCD --> CLI
+    IMG --> CLI
+    CFG --> CLI
+
+    CLI -->|BGR 帧 + K| slam_p
+    CLI -->|有序 PCD 路径| lidar_p
+    CLI -->|map.npz + lidar_traj.npz| fusion_p
+    CLI -->|图像序列| sfm_p
+    CLI -->|图像| perc_p
+    CLI --> deploy_p
+
+    CAM -->|VideoCapture 读帧| FE
+    CFG -->|Intrinsics → K 3×3| TR
+    FE -->|灰度图| TR
+    FE -->|keypoints + descriptors| TR
+    TR -->|Frame.pose_R, pose_t| MAP_SLAM[(Map: 3D 点 + 关键帧位姿)]
+    TR -->|descriptors| LC
+    MAP_SLAM -->|points, keyframe_*| NPZ_VO[map.npz]
+    TR -->|pose_t 轨迹| VIZ1
+
+    LOAD -->|open3d PointCloud| ODOM
+    ODOM -->|4×4 位姿序列| MAP
+    MAP -->|全局点云| PCD_OUT[lidar_map.pcd]
+    MAP -->|trajectory| NPZ_LIDAR[lidar_traj.npz poses N×4×4]
+
+    NPZ_VO --> LVO
+    NPZ_LIDAR --> LLD
+    LVO -->|list 4×4 body-to-world| PG
+    LLD -->|list 4×4| PG
+    PG -->|x,y,theta 序列| NPZ_FUSE[fused_trajectory.npz]
+
+    LI -->|BGR 图 + 路径| SF
+    CFG -.->|默认 K 来自首图尺寸| SF
+    SF -->|稀疏 3D 点| PLY[sfm_pointcloud.ply]
+    SF -->|R_list, t_list| NPZ_SFM[sfm_poses.npz]
+
+    IMG -->|numpy 图像| PS
+    PS -->|det_results / seg_mask / depth_map| OUT_UI[Demo 窗口或返回值]
+
+    deploy_p --> ONNX
+    ONNX --> ORT
+    IMG -.->|可选| ORT
